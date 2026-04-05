@@ -38,7 +38,7 @@ public class Entretien extends Entite {
     @Override
     public String afficher() {
         return "Entretien{" +
-                "vehicule=" + vehicule +
+                "vehicule=" + vehicule.getImmatriculation() +
                 ", date=" + date +
                 ", description='" + description + '\'' +
                 ", cout=" + cout +

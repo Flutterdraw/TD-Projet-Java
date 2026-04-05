@@ -73,11 +73,11 @@ public class Vehicule extends Entite {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Vehicule vehicule = (Vehicule) o;
-        return getKilometrage() == vehicule.getKilometrage() && Objects.equals(getImmatriculation(), vehicule.getImmatriculation()) && getEtat() == vehicule.getEtat();
+        return getKilometrage() == vehicule.getKilometrage() && Objects.equals(getImmatriculation(), vehicule.getImmatriculation());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getImmatriculation(), getKilometrage(), getEtat());
+        return Objects.hash(getImmatriculation(), getKilometrage());
     }
 }

@@ -63,12 +63,13 @@ public class Main {
 
         Entretien e1 = new Entretien(1L, v2, LocalDate.of(2024,2,3), "ploblème léger", 5000);
         Entretien e2 = new Entretien(2L, v3, LocalDate.of(2025,7,15), "très abîmé", 12000);
+        Entretien e3 = new Entretien(3L, v3, LocalDate.of(2025,8,2), "abîmé", 10000);
 
         Location l1 = new Location(1L, v1, c2, LocalDate.of(2026, 1, 8), 14000);
 
         // A - Test
-        Tests<Vehicule> estDispo = v -> v.getEtat().equals(EtatVehicule.DISPONIBLE);
-        Tests<Vehicule> enPanne = v -> v.getEtat().equals(EtatVehicule.EN_PANNE);
+        Tests<Vehicule> estDispo = v -> v.getEtat() == EtatVehicule.DISPONIBLE;
+        Tests<Vehicule> enPanne = v -> v.getEtat() == EtatVehicule.EN_PANNE;
         Tests<Vehicule> KmDepasseSeuil = v -> v.getKilometrage() > 100000;
         Tests<Vehicule> Areviser = v -> v.getKilometrage() > 100000 || v.getAnnee() < 2020;
         Tests<Conducteur> estAutorise = c -> c.getPermis().startsWith("A");
@@ -141,5 +142,22 @@ public class Main {
          IO.println("--- Comparaison Voiture (Immatriculation) ---");
         service.trierVehicules(flotte, compareImmatriculationV);
         flotte.forEach(v -> IO.println(v.afficher()));
+
+        IO.println("--- Test 2 entretiens 1 véhicule ---");
+        service.ajouterEntretien(e2);
+        service.ajouterEntretien(e3);
+        List<Entretien> VehiculeparID = service.getEntretiens(3L);
+        VehiculeparID.forEach(e -> IO.println(e.afficher()));
+
+        IO.println("--- Kilomètrage Moyen ---");
+        IO.println("Le kilomètrage moyen des véhicules est de: "+service.getKilometrageMoyen());
+
+        IO.println("--- Véhicule par Etat ---");
+        Map<EtatVehicule, Long> vehicules2 = service.getNombreVehiculesParEtat();
+        vehicules2.forEach((v, l) -> IO.println("Le nombre de véhicule "+ v +" : "+ l));
+
+        IO.println("--- Coût Entretien ---");
+        Map<String, Integer> Entretiens = service.getTotalCoutsParVehicule();
+        Entretiens.forEach((i, t) -> IO.println("Le coût de l'entretien de cet véhicule("+ i +") est de : "+ t +" cfa"));
     }
 }
