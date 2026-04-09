@@ -1,9 +1,11 @@
 package sn.FatyNdao.l2gl.app.app;
 import sn.FatyNdao.l2gl.app.model.*;
+import sn.FatyNdao.l2gl.app.repo.InMemoryCrud;
 import sn.FatyNdao.l2gl.app.service.ParcAutoService;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class Main {
     static void main(String[] args) {
@@ -47,11 +49,12 @@ public class Main {
     */
 
         ParcAutoService service = new ParcAutoService();
+        InMemoryCrud<Vehicule> service1 = new InMemoryCrud<>();
 
         List<Vehicule> flotte = new ArrayList<>();
         Vehicule v1 = new Vehicule(1L, "DK-123-AA", "Toyota", 2020, EtatVehicule.DISPONIBLE, 2000);
         Vehicule v2 = new Vehicule(2L, "TH-456-BB", "Peugeot", 2015, EtatVehicule.EN_REVISION, 1200);
-        Vehicule v3 = new Vehicule(3L, "SL-789-CC", "Mercedes", 2022, EtatVehicule.EN_PANNE, 1700);
+        Vehicule v3 = new Vehicule(3L, "SL-789-CC", "Mercedes", 2022, EtatVehicule.DISPONIBLE, 1700);
         Vehicule v4 = new Vehicule(4L, "ZG-001-DD", "Renault", 2018, EtatVehicule.EN_LOCATION, 1500);
         flotte.add(v1);
         flotte.add(v2);
@@ -65,7 +68,13 @@ public class Main {
         Entretien e2 = new Entretien(2L, v3, LocalDate.of(2025,7,15), "très abîmé", 12000);
         Entretien e3 = new Entretien(3L, v3, LocalDate.of(2025,8,2), "abîmé", 10000);
 
-        Location l1 = new Location(1L, v1, c2, LocalDate.of(2026, 1, 8), 14000);
+        Vehicule v5 = new Vehicule(5L, "RT-769-PP", "Mercedes", 2022, EtatVehicule.DISPONIBLE, 1700);
+        Vehicule v6 = new Vehicule(6L, "PL-002-TT", "Renault", 2018, EtatVehicule.EN_LOCATION, 1500);
+
+        Location l1 = new Location(1L, v5, c2, LocalDate.of(2026, 1, 8), 14000);
+        Location l2 = new Location(2L, v6, c1, LocalDate.of(2025, 10, 8), 9000);
+        Location l3 = new Location(3L, v2, c2, LocalDate.of(2026, 4, 4), 12000);
+        Location l4 = new Location(4L, v3, c1, LocalDate.of(2026, 2, 13), 10000);
 
         // A - Test
         Tests<Vehicule> estDispo = v -> v.getEtat() == EtatVehicule.DISPONIBLE;
@@ -159,5 +168,45 @@ public class Main {
         IO.println("--- Coût Entretien ---");
         Map<String, Integer> Entretiens = service.getTotalCoutsParVehicule();
         Entretiens.forEach((i, t) -> IO.println("Le coût de l'entretien de cet véhicule("+ i +") est de : "+ t +" cfa"));
+
+        IO.println("--- Affichage ---");
+        IO.println(v1.afficher());
+        IO.println(c1.afficher());
+        IO.println(e1.afficher());
+        IO.println(l1.afficher());
+
+        IO.println("--- Optional ---");
+        service1.create(new Vehicule(1L, "TH-486-AA", "Toyotra", 1998, EtatVehicule.EN_PANNE, 400));
+        service1.create(new Vehicule(2L, "SL-246-BB", "Lamborghini", 2023, EtatVehicule.EN_LOCATION, 44400));
+        Vehicule v01 = service1.readOpt(1L).orElse(new Vehicule(0L, "XX-XXX-XX", "Inconnu", 1990, EtatVehicule.EN_REVISION, 0));
+        Vehicule v02 = service1.readOpt(2L).orElseThrow(() -> new NoSuchElementException("Véhicule inexistant"));
+        IO.println(v01.afficher());
+        IO.println(v02.afficher());
+        service1.readOpt(1L).ifPresent(v -> IO.println(v.afficher()));
+
+        IO.println("--- Rapport ---");
+        List<LigneRapport> genererRapport = List.of(
+                new LigneRapport("RE-852-LL", "Buggati", EtatVehicule.DISPONIBLE, 85000),
+                new LigneRapport("FM-911-AA", "Toyota", EtatVehicule.EN_LOCATION, 90000),
+                new LigneRapport("AC-976-RR", "Coccinelle", EtatVehicule.EN_LOCATION, 30000)
+        );
+        genererRapport.forEach(IO::println);
+
+        IO.println("--- Finalisation ---");
+        service.DemarrerLocation(l1);
+        service.TerminerLocation(l2);
+        IO.println(v5.afficher());
+        IO.println(v6.afficher());
+        service.ajouterLocation(l1);
+        service.ajouterLocation(l2);
+        service.ajouterLocation(l3);
+        service.ajouterLocation(l4);
+        int year = LocalDate.now().getYear();
+        Predicate<Location> rules = l -> l.getVehicule().getKilometrage() > 1000 || year-l.getVehicule().getAnnee() > 20 || l.dureeJours() > 15;
+        List<Vehicule> VehiculesAreviser = service.VaReviser(rules);
+        IO.println("--- Liste à réviser ---");
+        VehiculesAreviser.forEach(v -> IO.println(v.afficher()));
+
+
     }
 }

@@ -2,7 +2,7 @@ package sn.FatyNdao.l2gl.app.model;
 
 import java.util.Objects;
 
-public class Vehicule extends Entite {
+public class Vehicule extends Entite implements Identifiable {
     private final String immatriculation;
     private final String marque;
     private int kilometrage;
@@ -10,7 +10,6 @@ public class Vehicule extends Entite {
     private final int annee;
 
     public Vehicule(Long id, String immatriculation, String marque, int annee, EtatVehicule etat, int kilometrage) {
-        super(id);
         if (immatriculation == null) {
             throw new IllegalArgumentException("Immatriculation invalide");
         }
@@ -18,11 +17,12 @@ public class Vehicule extends Entite {
             throw new IllegalArgumentException("Marque invalide");
         }
         if (kilometrage < 0) {
-            throw new IllegalArgumentException("Kilometrage ne peut pas etre negatif");
+            throw new IllegalArgumentException("Kilometrage ne peut pas être négatif");
         }
         if (annee < 1990) {
             throw new IllegalArgumentException("Annee ne peut pas être inférieur à 1990");
         }
+        super(id);
         this.immatriculation = immatriculation;
         this.marque = marque;
         this.annee = annee;
@@ -61,11 +61,11 @@ public class Vehicule extends Entite {
     @Override
     public String afficher() {
         return "Vehicule{" +
-                "immatriculation='" + immatriculation + '\'' +
-                ", marque='" + marque + '\'' +
-                ", kilometrage=" + kilometrage +
-                ", Etat=" + Etat +
-                ", annee=" + annee +
+                "immatriculation = '" + immatriculation + '\'' +
+                ", marque = '" + marque + '\'' +
+                ", kilomètrage = " + kilometrage +
+                ", Etat = " + Etat +
+                ", année = " + annee +
                 '}';
     }
 

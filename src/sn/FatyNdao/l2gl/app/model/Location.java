@@ -45,7 +45,7 @@ public class Location extends Entite{
 
     public void terminer(LocalDate fin) {
         if (fin.isBefore(this.dateDebut))
-            throw new IllegalArgumentException("La date de fin ne peut pas être avant celle de début");
+            throw new IllegalArgumentException("La date de fin ne peut pas être avant celle du début");
 
         this.dateFin = Optional.of(fin);
     }

@@ -3,11 +3,15 @@ package sn.FatyNdao.l2gl.app.service;
 import sn.FatyNdao.l2gl.app.model.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ParcAutoService {
 
     private final List<Vehicule> vehicules = new ArrayList<>();
+    private final List<Vehicule> vehiculesAreviser = new ArrayList<>();
+    private final List<Location> locations = new ArrayList<>();
+    private final List<LigneRapport> rapports = new ArrayList<>();
     private final Map<String, Vehicule> indexParImmat = new HashMap<>();
     private final Map<Long, List<Entretien>> entretiensParVehiculeId = new HashMap<>();
 
@@ -126,6 +130,43 @@ public class ParcAutoService {
                         e -> e.getVehicule().getImmatriculation(),
                         Collectors.summingInt(Entretien::getCout)
                 ));
+    }
+
+    public List<LigneRapport> rapport() {
+        return rapports.stream()
+                .map(r -> new LigneRapport(
+                        r.immat(),
+                        r.marque(),
+                        r.etat(),
+                        r.km()
+                )).toList();
+    }
+
+    public void DemarrerLocation(Location l){
+        if (l.getVehicule().getEtat() != EtatVehicule.DISPONIBLE){
+            throw new IllegalArgumentException("Véhicule Indisponible");
+        }
+        l.getVehicule().setEtat(EtatVehicule.EN_LOCATION);
+    }
+
+    public void TerminerLocation(Location l){
+        if (l.getVehicule().getEtat() != EtatVehicule.EN_LOCATION){
+            throw new IllegalArgumentException("Véhicule non loué");
+        }
+        l.getVehicule().setEtat(EtatVehicule.DISPONIBLE);
+    }
+
+    public void ajouterLocation(Location l) {
+        if (l == null) return;
+
+        locations.add(l);
+    }
+
+    public List<Vehicule> VaReviser (Predicate<Location> rules){
+        return locations.stream()
+                .filter(rules)
+                .map(Location::getVehicule)
+                .toList();
     }
 
 }

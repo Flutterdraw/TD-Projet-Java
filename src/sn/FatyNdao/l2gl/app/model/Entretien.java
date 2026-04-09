@@ -10,7 +10,7 @@ public class Entretien extends Entite {
 
     public Entretien(Long id, Vehicule vehicule, LocalDate date, String description, int cout) {
         if (cout < 0 ){
-            throw new IllegalArgumentException("Count ne peut pas être négatif");
+            throw new IllegalArgumentException("Cout ne peut pas être négatif");
         }
         super(id);
         this.vehicule = vehicule;
